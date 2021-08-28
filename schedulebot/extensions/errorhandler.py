@@ -4,10 +4,15 @@ import sys
 import discord.errors
 from discord.ext import commands
 
-from decbot.lib import errors, utils
-from decbot.lib.constants import emojis
+from schedulebot.lib import errors, utils
 
-logger = logging.getLogger("decbot")
+logger = logging.getLogger("schedulebot")
+
+
+class emojis:
+    info = "<:info:788307532586287114>"
+    warning = "<:warning:788307532484968459>"
+    error = "<:error:788307532278923275>"
 
 
 def setup(bot):

@@ -41,7 +41,7 @@ class NoPermissionsException(DigiException):
     level = logging.ERROR
 
     def formatMessage(self):
-        return "DECBot does not have the permssions to perform this action."
+        return "ScheduleBot does not have the permssions to perform this action."
 
 
 class AdminPermissionException(DigiContextException):

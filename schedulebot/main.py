@@ -1,42 +1,29 @@
-import importlib.resources as pkg_resources
+
 import os
-import logging
 import sys
 from datetime import datetime
-from pathlib import Path
+import logging
+import digiformatter.styles
 
 import discord
 from discord.ext.commands import Bot
 
-from digiformatter import styles, logger as digilogger
+import discordn
 
 from schedulebot import __version__
-from schedulebot import discordplus
-from schedulebot.conf import conf
+from schedulebot.conf import ConfLoadException, conf, load_conf
 from schedulebot.lib import paths
-from schedulebot.lib.loglevels import BANNER, LOGIN, CMD
+from schedulebot.lib.loglevels import BANNER, CMD, LOGIN
 from schedulebot.lib.utils import truncate
+from schedulebot.logger import init_logging
 
-logging.basicConfig(level=CMD)
-dfhandler = digilogger.DigiFormatterHandler()
-dfhandler.setLevel(CMD)
+init_logging()
+
+discordn.patch()
 
 logger = logging.getLogger("schedulebot")
-logger.setLevel(CMD)
-logger.handlers = []
-logger.propagate = False
-logger.addHandler(dfhandler)
-
-discordlogger = logging.getLogger("discord")
-discordlogger.setLevel(logging.WARN)
-discordlogger.handlers = []
-discordlogger.propagate = False
-discordlogger.addHandler(dfhandler)
-
-initial_cogs = ["admin"]
+initial_cogs = ["calendar"]
 initial_extensions = ["errorhandler"]
-
-discordplus.patch()
 
 
 def initConf():
@@ -52,17 +39,8 @@ def initConf():
 
 def main():
     try:
-        conf.load()
-    except FileNotFoundError as e:
-        logger.error(f"Configuration file not found: {e.filename}")
-        confpath = Path(e.filename)
-        logger.warn("Writing default settings file...")
-        default_settings = pkg_resources.read_text(schedulebot.data, "settings.ini")
-        confpath.parent.mkdir(parents = True, exist_ok = True)
-        with open(confpath, "w") as f:
-            f.write(default_settings)
-        os.startfile(confpath.parent)
-        logger.info("Please reload the bot.")
+        load_conf()
+    except ConfLoadException:
         return
 
     launchtime = datetime.now()
@@ -84,7 +62,7 @@ def main():
 
         # Print the splash screen.
         # Obviously we need the banner printed in the terminal
-        banner = ("schedulebot " + __version__)
+        banner = ("ScheduleBot " + __version__)
         logger.log(BANNER, banner)
         logger.log(LOGIN, f"Logged in as: {bot.user.name} ({bot.user.id})\n------")
 
@@ -95,15 +73,15 @@ def main():
 
         # More splash screen.
         await bot.change_presence(activity = activity)
-        print(styles)
+        print(digiformatter.styles)
         logger.info(f"Prefix: {conf.prefix}")
         launchfinishtime = datetime.now()
         elapsed = launchfinishtime - launchtime
-        logger.debug(f"Agendroid launched in {round((elapsed.total_seconds() * 1000), 3)} milliseconds.\n")
+        logger.debug(f"ScheduleBot launched in {round((elapsed.total_seconds() * 1000), 3)} milliseconds.\n")
 
     @bot.event
     async def on_reconnect_ready():
-        logger.error("Agendroid has been reconnected to Discord.")
+        logger.error("ScheduleBot has been reconnected to Discord.")
 
     @bot.event
     async def on_command(ctx):
@@ -127,7 +105,7 @@ def main():
         await bot.process_commands(after)
 
     def on_disconnect():
-        logger.error("Agendroid has been disconnected from Discord!")
+        logger.error("ScheduleBot has been disconnected from Discord!")
 
     if not conf.authtoken:
         logger.error("Authentication token not found!")

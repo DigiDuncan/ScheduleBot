@@ -1,14 +1,24 @@
+import logging
+import importlib.resources as pkg_resources
+import os
+from pathlib import Path
 import toml
 
+import schedulebot.data
 from schedulebot.lib import paths
 from schedulebot.lib.attrdict import AttrDict
 from schedulebot.lib.pathdict import PathDict
 
+logger = logging.getLogger("schedulebot")
 
 SENTINEL = object()
 
 
 class ConfigError(Exception):
+    pass
+
+
+class ConfLoadException(Exception):
     pass
 
 
@@ -65,7 +75,23 @@ class Config(AttrDict):
 
 conf = Config([
     ConfigField("prefix", "schedulebot.prefix", default="?"),
-    ConfigField("name", "schedulebot.name", default="Agendroid"),
+    ConfigField("name", "schedulebot.name", default="Schedulebot"),
     ConfigField("activity", "schedulebot.activity", default="with the timeline"),
     ConfigField("authtoken", "discord.authtoken", initdefault="INSERT_BOT_TOKEN_HERE")
 ])
+
+
+def load_conf() -> None:
+    try:
+        conf.load()
+    except FileNotFoundError as e:
+        logger.error(f"Configuration file not found: {e.filename}")
+        confpath = Path(e.filename)
+        logger.warn("Writing default settings file...")
+        default_settings = pkg_resources.read_text(schedulebot.data, "settings.ini")
+        confpath.parent.mkdir(parents = True, exist_ok = True)
+        with open(confpath, "w") as f:
+            f.write(default_settings)
+        os.startfile(confpath.parent)
+        logger.info("Please reload the bot.")
+        raise ConfLoadException()
