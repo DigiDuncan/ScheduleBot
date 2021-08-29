@@ -10,6 +10,7 @@ import discordn
 
 from schedulebot import __version__
 from schedulebot.conf import ConfLoadException, conf, load_conf
+from schedulebot.lib import db
 from schedulebot.lib.logger import init_logging, BANNER, CMD, LOGIN
 from schedulebot.lib.utils import truncate
 
@@ -18,6 +19,9 @@ init_logging()
 discordn.patch()
 
 logger = logging.getLogger(__package__)
+
+
+db.init()
 
 
 class ScheduleBot(Bot):
