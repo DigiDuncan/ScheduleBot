@@ -13,4 +13,4 @@ def getDataDir():
 # File paths
 datadir = getDataDir()
 confpath = datadir / "schedulebot.conf"
-tempdir = datadir / "temp"
+dbpath = datadir / "schedulebot.db"

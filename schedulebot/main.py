@@ -13,9 +13,8 @@ import discordn
 from schedulebot import __version__
 from schedulebot.conf import ConfLoadException, conf, load_conf
 from schedulebot.lib import paths
-from schedulebot.lib.loglevels import BANNER, CMD, LOGIN
+from schedulebot.lib.logger import init_logging, BANNER, CMD, LOGIN
 from schedulebot.lib.utils import truncate
-from schedulebot.logger import init_logging
 
 init_logging()
 
@@ -23,7 +22,7 @@ discordn.patch()
 
 logger = logging.getLogger("schedulebot")
 initial_cogs = ["calendar"]
-initial_extensions = ["errorhandler"]
+initial_extensions = []
 
 
 def initConf():

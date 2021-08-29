@@ -6,7 +6,7 @@ class CalendarCog(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def duck(self, ctx):
+    async def duck(self, ctx, where: str):
         await ctx.send("Where?")
 
 
