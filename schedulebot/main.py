@@ -21,9 +21,6 @@ discordn.patch()
 logger = logging.getLogger(__package__)
 
 
-db.init()
-
-
 class ScheduleBot(Bot):
     async def on_first_ready(self):
         await super().on_first_ready()
@@ -55,6 +52,8 @@ def main():
         load_conf()
     except ConfLoadException:
         return
+
+    db.init()
 
     extensions = []
     cogs = ["calendar"]
